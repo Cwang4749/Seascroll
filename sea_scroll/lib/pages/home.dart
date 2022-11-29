@@ -144,42 +144,51 @@ class _HomeState extends State<Home> {
                                       child: Container(
                                           height: 60,
                                           decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              color: Color.fromRGBO(
-                                                  239, 253, 255, 1)),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: Color.fromRGBO(
+                                                239, 253, 255, 1),
+                                          ),
                                           alignment: Alignment.centerLeft,
                                           margin: const EdgeInsets.symmetric(
                                               horizontal: 0, vertical: 2),
                                           child: Row(children: [
-                                            Container(
-                                                height: 40,
-                                                margin:
-                                                    const EdgeInsets.fromLTRB(
-                                                        10, 0, 20, 0),
-                                                child: CircleAvatar(
-                                                    backgroundColor: colors[
-                                                        random.nextInt(
-                                                            colors.length)],
-                                                    child: Text(
-                                                        name[0].toUpperCase(),
-                                                        style: const TextStyle(
-                                                            fontSize: 18,
-                                                            fontFamily:
-                                                                'Roboto',
-                                                            color: Colors
-                                                                .black)))),
-                                            Material(
-                                              child: Text(name.toUpperCase(),
-                                                  style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontFamily: 'Roboto',
-                                                      color: Colors.teal,
-                                                      backgroundColor:
-                                                          Color.fromRGBO(
-                                                              239, 253, 255, 1),
-                                                      fontWeight:
-                                                          FontWeight.w400)),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Container(
+                                                  height: 40,
+                                                  margin:
+                                                      const EdgeInsets.fromLTRB(
+                                                          10, 0, 20, 0),
+                                                  child: CircleAvatar(
+                                                      backgroundColor: colors[
+                                                          random.nextInt(
+                                                              colors.length)],
+                                                      child: Text(
+                                                          name[0].toUpperCase(),
+                                                          style: const TextStyle(
+                                                              fontSize: 18,
+                                                              fontFamily:
+                                                                  'Roboto',
+                                                              color: Colors
+                                                                  .black)))),
+                                            ),
+                                            Expanded(
+                                              flex: 3,
+                                              child: Material(
+                                                child: Text(name.toUpperCase(),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                        fontSize: 20,
+                                                        fontFamily: 'Roboto',
+                                                        color: Colors.teal,
+                                                        backgroundColor:
+                                                            Color.fromRGBO(239,
+                                                                253, 255, 1),
+                                                        fontWeight:
+                                                            FontWeight.w400)),
+                                              ),
                                             )
                                           ])));
                                 },
