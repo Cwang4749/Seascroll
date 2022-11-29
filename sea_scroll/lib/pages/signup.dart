@@ -13,6 +13,7 @@ import '../components/montStyle.dart';
 import '../components/snackbar-message.dart';
 
 import 'login.dart';
+import 'package:sea_scroll/pages/info.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -104,8 +105,11 @@ class _RegisterPageState extends State<RegisterPage> {
       }
 
       //If authentication was succesful, go to homepage
-      Navigator.push(
-          context, MaterialPageRoute(builder: ((context) => Home())));
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        Navigator.push(context, MaterialPageRoute(builder: ((context) => Info())));
+      });
+      // Navigator.push(
+      //     context, MaterialPageRoute(builder: ((context) => Home())));
     } on FirebaseAuthException catch (e) {
       //If there are errors, send a message to let the user know
       String errorMessage = "";
