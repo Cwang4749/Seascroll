@@ -9,7 +9,7 @@ import '../pages/signup.dart';
 snackBarMessage(String error, String label, void Function() callback) {
   return SnackBar(
     action: SnackBarAction(
-      textColor: Color(0xFFC3B1E1),
+      textColor: Color.fromARGB(255, 37, 156, 166),
       label: label,
       onPressed: 
         callback

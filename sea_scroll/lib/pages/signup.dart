@@ -31,7 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameTextController = TextEditingController();
   final TextEditingController _bioTextController = TextEditingController();
   final TextEditingController _profilePicLinkTextController =
-      TextEditingController();
+    TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
   final TextEditingController _passwordTextController = TextEditingController();
 
@@ -68,7 +68,7 @@ class _RegisterPageState extends State<RegisterPage> {
           email: _emailTextController.text,
           password: _passwordTextController.text);
       print("Successfully created user with the following info");
-
+      
       //Updating Firebase Auth info for user
       try {
         Auth().updateName(name: _nameTextController.text);
@@ -135,6 +135,47 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  /* This method checks if all the required fields are filled before calling FirebaseAuth method for signing up.
+    The user will get an error message with the first field that's empty, until they are all filled, in 
+    which they can actually submit.
+  */
+  void isReadyToSubmit(){
+    //Required fields, pfp is not required
+    bool nameIsEmpty = _nameTextController.text.trim() == "";
+    bool bioIsEmpty = _bioTextController.text.trim() == "";
+    bool emailIsEmpty = _emailTextController.text.trim() == "";
+    bool passwordIsEmpty = _passwordTextController.text.trim() == "";
+
+    String errorMessage = "Please make sure all fields are entered.";
+    if(nameIsEmpty)
+    {
+      errorMessage = "Please enter a name.";
+      ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(errorMessage,
+          "Try again", () {}));
+    }
+    else if(bioIsEmpty)
+    {
+      errorMessage = "Please enter a bio.";
+      ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(errorMessage,
+          "Try again", () {}));
+    }
+    else if(emailIsEmpty)
+    {
+      errorMessage = "Please enter an email.";
+      ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(errorMessage,
+          "Try again", () {}));
+    }
+    else if(passwordIsEmpty)
+    {
+      errorMessage = "Please enter a password.";
+      ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(errorMessage,
+          "Try again", () {}));
+    }
+    else {
+      createUserWithEmailAndPassword();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,12 +194,6 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               // ignore: prefer_const_literals_to_create_immutables
               children: [
-                // Icon(
-                //   Icons.android,
-                //   size: 100,
-                // ),
-                //Intro
-
                 const Text(
                   'Welcome!',
                   style: TextStyle(
@@ -319,14 +354,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: () {
                       /*Navigator.push(context,
                         MaterialPageRoute(builder: ((context) => Home())));*/
-                      createUserWithEmailAndPassword();
+                      isReadyToSubmit();
+                      //createUserWithEmailAndPassword();
                     },
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(25),
-                        backgroundColor: Colors.blue[200],
+                        backgroundColor: const Color.fromARGB(255, 37, 156, 166),
                         minimumSize: const Size.fromHeight(75),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12))),
+                          borderRadius: BorderRadius.circular(12))),
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(
@@ -357,6 +393,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         'Login Here.',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 37, 156, 166)
                         ),
                       ),
                     ),

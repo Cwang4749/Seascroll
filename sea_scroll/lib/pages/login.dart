@@ -75,6 +75,33 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+   /* This method checks if all the required fields are filled before calling FirebaseAuth method for signing in.
+    The user will get an error message with the first field that's empty, until they are both filled, in 
+    which they can actually submit.
+  */
+  void isReadyToSubmit(){
+
+    //Required fields
+    bool emailIsEmpty = _emailTextController.text.trim() == "";
+    bool passwordIsEmpty = _passwordTextController.text.trim() == "";
+
+    String errorMessage = "Please make sure all fields are entered.";
+    if(emailIsEmpty)
+    {
+      errorMessage = "Please enter an email.";
+      ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(errorMessage,
+          "Try again", () {}));
+    }
+    else if(passwordIsEmpty)
+    {
+      errorMessage = "Please enter a password.";
+      ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(errorMessage,
+          "Try again", () {}));
+    }
+    else {
+      signInWithEmailAndPassword();
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,15 +208,16 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 10),
 
+                //Sign in Button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: ElevatedButton(
                     onPressed: () {
-                      signInWithEmailAndPassword();
+                      isReadyToSubmit();
                     },
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(25),
-                        backgroundColor: Colors.blue[200],
+                        backgroundColor: Color.fromARGB(255, 37, 156, 166),
                         minimumSize: const Size.fromHeight(75),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12))),
@@ -215,15 +243,13 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => RegisterPage())));
+                        showSignUpPage();
                       },
                       child: const Text(
                         'Register Here.',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 37, 156, 166)
                         ),
                       ),
                     ),
