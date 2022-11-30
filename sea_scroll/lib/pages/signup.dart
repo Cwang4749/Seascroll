@@ -6,17 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sea_scroll/pages/home.dart';
 import '../auth.dart';
 
-import '../components/back-btn.dart';
-import '../components/elevated-box-decoration.dart';
-import '../components/enter-btn.dart';
-import '../components/montStyle.dart';
 import '../components/snackbar-message.dart';
 
 import 'login.dart';
 import 'package:sea_scroll/pages/info.dart';
 
 import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -61,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
     Navigator.push(
         context, MaterialPageRoute(builder: ((context) => LoginPage())));
   }
-
+  /* Creates a user w/ email and password and adds them to the user table in our Cloud database */
   Future<void> createUserWithEmailAndPassword() async {
     try {
       await Auth().createUserWithEmailAndPassword(
@@ -88,8 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
       String? userID = Auth().currentUser?.uid;
 
       //Adding user to the user table in our database
-      if (_profilePicLinkTextController.text ==
-          "") //if pfp empty, just add name/bio
+      if (_profilePicLinkTextController.text =="") //if pfp empty, just add name/bio
       {
         _postData(
           userid: userID!,
@@ -132,6 +126,79 @@ class _RegisterPageState extends State<RegisterPage> {
         }
         //otherwise don't do anything
       }));
+    }
+  }
+
+  /* Creates a user using google sign in and adds them to the user table in our Cloud database 
+    if this is their first time log in
+  */
+  Future<void> signInWithGoogle() async {
+    bool firstTime = false;
+    try{
+      print('SIGNING IN WITH GOOGLE');
+      String trySignIn = await Auth().signInWithGoogle();
+
+      //If not empty, Google sign in was unsuccessful, so show the user the message and don't continue on to add to user table
+      if(trySignIn!="") {
+        ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(
+          trySignIn, "Try again",
+          () {}
+        ));
+        return;
+      }
+      //Google sign in was successful, so go on to see if we need to add them to the user table.
+
+      print('Creation timeeee: ${Auth().currentUser?.metadata.creationTime}');
+      print('Last sign in timeeee: ${Auth().currentUser?.metadata.lastSignInTime}');
+
+      //Comparing diff between signup and last log in to see if this is the first time login in
+      DateTime? signUpTime = Auth().currentUser?.metadata.creationTime;
+      DateTime? lastSignInTime = Auth().currentUser?.metadata.lastSignInTime;
+      final difference = lastSignInTime?.difference(signUpTime!).inMinutes;
+      print('DIFFERENCE IS: ${difference}');
+
+      /*If it's the user's first time login in meaning the difference between sign up time 
+      and last login is less than a minute, add user to the database w/ their Google info 
+      if they left the fields empty to add name, bio, pfp, etc.
+      */
+      if(Auth().currentUser!=null && (difference!=null&&difference<1))
+      {
+        firstTime = true;
+        String? userID = Auth().currentUser?.uid; 
+        try{
+          if(Auth().currentUser?.photoURL!=null) //If there's a photo in firebase
+          {
+            Auth().postUser( //post user w/ photo
+              userid: userID!, 
+              name: _nameTextController.text==""?'${Auth().currentUser!.displayName}':_nameTextController.text, 
+              bio: _bioTextController.text==""?'SeaScroll User':_bioTextController.text,
+              pfp: _profilePicLinkTextController.text==""?Auth().currentUser!.photoURL:_profilePicLinkTextController.text,
+            );
+          }
+          else{
+            Auth().postUser( //otherwise post w/o
+              userid: Auth().currentUser!.uid, 
+              name: _nameTextController.text==""?'${Auth().currentUser!.displayName}':_nameTextController.text, 
+              bio: _bioTextController.text==""?'SeaScroll User':_bioTextController.text,
+            );
+          }
+        } catch(e)
+        {
+          print("There's an error with posting new user w/ google sign in $e");
+        }
+      }
+      //If first time signin AND user being added to table is successful, show info page 
+      firstTime?
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          firstTime = false;
+          print('firsttime $firstTime');
+          Navigator.push(context, MaterialPageRoute(builder: ((context) => Info())));
+        })
+      //otherwise, if not first time, go straight to homepage
+      : Navigator.push(
+          context, MaterialPageRoute(builder: ((context) => Home())));
+    } on FirebaseAuthException catch(e){
+      print("There's an error with google sign in${e.code}");
     }
   }
 
@@ -373,8 +440,31 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                 ),
+                SizedBox(height: 10),
 
-                const SizedBox(height: 25),
+                const Text('Or Sign Up With',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 37, 156, 166),
+                    fontWeight: FontWeight.bold)
+                ),
+
+                SizedBox(height: 10),
+
+                //Google Sign In
+                ElevatedButton(
+                  onPressed: (){
+                    signInWithGoogle();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+
+                  ),
+                  child: Image.asset(
+                    'assets/google-logo.png',
+                    scale: 50
+                  ), 
+                ),
+                //const SizedBox(height: 25),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

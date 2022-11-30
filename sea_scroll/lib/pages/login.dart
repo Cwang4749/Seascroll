@@ -4,12 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sea_scroll/pages/home.dart';
+import 'package:sea_scroll/pages/info.dart';
 import '../auth.dart';
-
-import '../components/back-btn.dart';
-import '../components/elevated-box-decoration.dart';
-import '../components/enter-btn.dart';
-import '../components/montStyle.dart';
 
 import '../components/snackbar-message.dart';
 import 'signup.dart';
@@ -33,14 +29,80 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> signInWithGoogle() async {
+    bool firstTime = false;
     try{
-      await Auth().signInWithGoogle();
-      Navigator.push(
+      //print('SIGNING IN WITH GOOGLE');
+      String trySignIn = await Auth().signInWithGoogle();
+
+      //If not empty, Google sign in was unsuccessful, so show the user the message and don't continue on to add to user table
+      if(trySignIn!="") {
+        ScaffoldMessenger.of(context).showSnackBar(snackBarMessage(
+          trySignIn, "Try again",
+          () {}
+        ));
+        return;
+      }
+      //Google sign in was successful, so go on to see if we need to add them to the user table.
+
+      print('Creation timeeee: ${Auth().currentUser?.metadata.creationTime}');
+      print('Last sign in timeeee: ${Auth().currentUser?.metadata.lastSignInTime}');
+
+      //Comparing diff between signup and last log in to see if this is the first time login in
+      DateTime? signUpTime = Auth().currentUser?.metadata.creationTime;
+      DateTime? lastSignInTime = Auth().currentUser?.metadata.lastSignInTime;
+      final difference = lastSignInTime?.difference(signUpTime!).inMinutes;
+
+      print('DIFFERENCE IS: ${difference}');
+      /*If it's the user's first time login in meaning the difference between sign up time and 
+      last login is less than a minute, add user to the database.
+      */
+      if(Auth().currentUser!=null && 
+      (difference!=null&&difference<1))
+      {
+        firstTime = true;
+        try{
+          if(Auth().currentUser?.photoURL!=null) //If there's a photo in firebase
+          {
+            Auth().postUser( //post user w/ photo
+              userid: Auth().currentUser!.uid, 
+              name: '${Auth().currentUser!.displayName}', 
+              bio: 'SeaScroll User',
+              pfp: Auth().currentUser!.photoURL,
+            );
+          }
+          else{
+            Auth().postUser( //otherwise post w/o
+              userid: Auth().currentUser!.uid, 
+              name: '${Auth().currentUser!.displayName}', 
+              bio: 'SeaScroll User',
+            );
+          }
+          
+        } catch(e)
+        {
+          print("There's an error with posting new user w/ google sign in $e");
+        }
+        
+      }
+
+      /*Navigator.push(
+          context, MaterialPageRoute(builder: ((context) => Home())));*/
+      //print('firsttime $firstTime');
+      //If first time signin AND user being added to table is successful, show info page 
+      firstTime?
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          firstTime = false;
+          print('firsttime $firstTime');
+          Navigator.push(context, MaterialPageRoute(builder: ((context) => Info())));
+        })
+      //otherwise, go straight to homepage
+      : Navigator.push(
           context, MaterialPageRoute(builder: ((context) => Home())));
     } on FirebaseAuthException catch(e){
-      print(e.code);
+      print("There's an error with google sign in${e.code}");
     }
   }
+  /* Signs in user w/ email and password*/
   Future<void> signInWithEmailAndPassword() async {
     try {
       await Auth().signInWithEmailAndPassword(
