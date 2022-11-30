@@ -32,6 +32,15 @@ class _LoginPageState extends State<LoginPage> {
         context, MaterialPageRoute(builder: ((context) => RegisterPage())));
   }
 
+  Future<void> signInWithGoogle() async {
+    try{
+      await Auth().signInWithGoogle();
+      Navigator.push(
+          context, MaterialPageRoute(builder: ((context) => Home())));
+    } on FirebaseAuthException catch(e){
+      print(e.code);
+    }
+  }
   Future<void> signInWithEmailAndPassword() async {
     try {
       await Auth().signInWithEmailAndPassword(
@@ -79,8 +88,8 @@ class _LoginPageState extends State<LoginPage> {
     The user will get an error message with the first field that's empty, until they are both filled, in 
     which they can actually submit.
   */
+  
   void isReadyToSubmit(){
-
     //Required fields
     bool emailIsEmpty = _emailTextController.text.trim() == "";
     bool passwordIsEmpty = _passwordTextController.text.trim() == "";
@@ -231,7 +240,30 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
+                
+                SizedBox(height: 10),
+                const Text('Or Sign In With',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 37, 156, 166),
+                    fontWeight: FontWeight.bold)
+                ),
 
+                SizedBox(height: 10),
+
+                //Google Sign In
+                ElevatedButton(
+                  onPressed: (){
+                    signInWithGoogle();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+
+                  ),
+                  child: Image.asset(
+                    'assets/google-logo.png',
+                    scale: 50
+                  ), 
+                ),
                 SizedBox(height: 25),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
