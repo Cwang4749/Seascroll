@@ -228,22 +228,23 @@ class _HomeState extends State<Home> {
             //               },
             //               child: Text("Add Myself"))),
             //     )),
-            Column(
-              children: [
-                Container(
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Post()),
-                      );
-                    },
-                    backgroundColor: Colors.blue,
-                    child: const Icon(Icons.add),
-                  ),
-                ),
-              ],
-            ),
+
+            // Column(
+            //   children: [
+            //     Container(
+            //       child: FloatingActionButton(
+            //         onPressed: () {
+            //           Navigator.push(
+            //             context,
+            //             MaterialPageRoute(builder: (context) => const Post()),
+            //           );
+            //         },
+            //         backgroundColor: Colors.blue,
+            //         child: const Icon(Icons.add),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -299,7 +300,25 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     SizedBox(
-                      width: 50,
+                      width: 30,
+                    ),
+                    Container(
+                      height: height / 15,
+                      width: height / 15,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Post()),
+                          );
+                        },
+                        backgroundColor: Colors.blue,
+                        child: const Icon(Icons.add),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 20,
                     ),
                     TextButton(
                       onPressed: () {
